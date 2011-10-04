@@ -1,0 +1,11 @@
+Statistics Calculator
+Nick Pascucci
+10/3/2011
+
+The file stats.py contains a simple statistical calculator that takes an
+arbitrary number of values (either integer or floating point) and calculates
+their mean, minimum, maximum, and population standard deviation. This data is
+printed to the terminal in interactive use, and can be obtained as a tuple from
+the get_stats(sequence) function defined in the module.
+
+Unit tests are included, and can be run by invoking stats_test.py.
