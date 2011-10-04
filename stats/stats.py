@@ -75,8 +75,8 @@ def main():
     print "All right, calculating!"
     stats = get_stats(vals)
     print ("Minimum: %f\n"
-           "Average: %f\n"
            "Maximum: %f\n"
+           "Average: %f\n"
            "Standard Deviation: %f\n") % stats
 
 if __name__ == "__main__":
