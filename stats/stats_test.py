@@ -61,5 +61,13 @@ class StatsTest(unittest.TestCase):
         get_stats(self.int_sequence)
         assert self.int_sequence == old_sequence
 
+    def test_min_gets_min(self):
+        min_val = get_min(self.int_sequence)
+        assert min_val == 1
+
+    def test_max_gets_max(self):
+        max_val = get_max(self.int_sequence)
+        assert max_val == 6
+        
 if __name__ == "__main__":
     unittest.main()

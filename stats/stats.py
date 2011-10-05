@@ -20,7 +20,7 @@ def get_avg(seq):
     return tot/len(seq)
 
 def get_std_dev(seq, avg=None):
-    """Calculate the standard deviation of a sequence of numbers.
+    """Calculate the population standard deviation of a sequence of numbers.
 
     Args:
     seq - A sequence of numbers.
@@ -40,22 +40,51 @@ def get_std_dev(seq, avg=None):
     std_dev = math.sqrt(squares_avg)
     return std_dev
 
+def get_min(values):
+    """Find the minimum value of a sequence.
+
+    Args:
+    values - A sequence of numerical types.
+
+    Returns:
+    The lowest value from the sequence.
+    """
+    if not values:
+        return None
+    min_val = values[0]
+    for val in values:
+        if val < min_val:
+            min_val = val
+    return min_val
+
+def get_max(values):
+    """Find the maximum value of a sequence.
+
+    Args:
+    values - A sequence of numerical types.
+
+    Returns:
+    The highest value from the sequence.
+    """
+    if not values:
+        return None
+    max_val = values[0]
+    for val in values:
+        if val > max_val:
+            max_val = val
+    return max_val
+
+
 def get_stats(values):
     """Calculate statistics for the given sequence.
+
     Args:
     values - A sequence of numerical types.
 
     Returns:
     A tuple (min, max, avg, std_dev).
     """
-    seq = values[:]
-    seq.sort()
-    stats = (
-        seq[0],  # Minimum
-        seq[-1],  # Maximum
-        get_avg(seq),  # Average
-        get_std_dev(seq)  # Std. Deviation
-        )
+    stats = (get_min(seq), get_max(seq), get_avg(seq), get_std_dev(seq))
     return stats
 
 def main():
