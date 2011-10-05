@@ -75,11 +75,11 @@ def get_max(values):
     return max_val
 
 
-def get_stats(values):
+def get_stats(seq):
     """Calculate statistics for the given sequence.
 
     Args:
-    values - A sequence of numerical types.
+    seq - A sequence of numerical types.
 
     Returns:
     A tuple (min, max, avg, std_dev).
@@ -88,6 +88,7 @@ def get_stats(values):
     return stats
 
 def main():
+    """Prompt the user for input and calculate statistics."""
     vals = []
     print ("Welcome to the statistical calculator.\n"
            "Enter any number of numbers.\n"

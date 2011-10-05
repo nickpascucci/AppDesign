@@ -31,7 +31,7 @@ class StatsTest(unittest.TestCase):
         error = abs(std_dev - self.std_dev)
         assert error < ACCEPTABLE_ERROR
 
-    def test_get_std_dev_returns_std_def_for_floats(self):
+    def test_get_std_dev_returns_std_dev_for_floats(self):
         std_dev = get_std_dev(self.float_sequence)
         error = abs(std_dev - self.std_dev)
         assert error < ACCEPTABLE_ERROR
