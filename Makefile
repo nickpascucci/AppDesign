@@ -4,7 +4,8 @@
 #
 # Licensed under the MIT License. See the full text in LICENSE.
 
-SUBDIRS=stats
+SUBDIRS = stats
+TOPLEVEL = $(shell basename `pwd`)
 
 lint:
 	@for dir in $(SUBDIRS); do \
@@ -26,3 +27,8 @@ docs: clean-docs
 
 clean-docs:
 	-rm docs/*
+
+dist:
+	@cd ../ ; \
+	tar -czf AppDesign.tar.gz $(TOPLEVEL); \
+	mv AppDesign.tar.gz $(TOPLEVEL)
