@@ -35,7 +35,7 @@ class MapperTest(unittest.TestCase):
         source.data = "HELLO, world!\0"
         sink = MockSocket()
         execute(source, sink)
-        assert sink.sent == '{"hello": 1}{"world": 1}'
+        assert sink.sent == '{"hello": 1}{"world": 1}\0'
 
 if __name__ == "__main__":
     unittest.main()

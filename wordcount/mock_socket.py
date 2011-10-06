@@ -34,6 +34,7 @@ class MockSocket(object):
 
     def sendall(self, string, flags=0):
         self.called_methods[self.sendall] = (string, flags)
+        self.sent += string
 
     def recv(self, bufsize, flags=0):
         """Record the arguments and then return the preset data."""
