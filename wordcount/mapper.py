@@ -5,13 +5,12 @@ import logging
 import socket
 import string
 import sys
-import os
 from AppDesign.util import netutils
 
 __author__ = "Nick Pascucci (npascut1@gmail.com)"
 
-HELP = """
-
+HELP = """Usage:
+mapper.py <source address> <source port> <mapper port>
 """
 
 def tokenize(inputs):
@@ -87,7 +86,7 @@ def main():
                             level=logging.DEBUG)
 
         # Bind to local address and listen for new connections (from srv_socket)
-        logging.debug("Binding to local address %s." % localhost)
+        logging.debug("Binding to local address %s.", localhost)
         srv_socket.bind((localhost, local_port))
         srv_socket.listen(0)
         

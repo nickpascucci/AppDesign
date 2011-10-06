@@ -1,11 +1,10 @@
 #! /usr/bin/env python
 
-import logging
+"""Simple source script for distributed Map/Reduce."""
+
 import socket
 import sys
 from AppDesign.util import netutils
-
-"""Simple source script for distributed Map/Reduce."""
 
 HELP = """Usage:
 source.py <filename> <port>

@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+"""Reducers for distributed Map/Reduce.
+
+This module contains code for both level 1 and level 2 reducers; see their
+respective main functions for more details.
+"""
+
 import logging
 import pickle
 import re
@@ -14,7 +20,7 @@ reducer.py 1 <mapper ip address> <mapper port> <reducer port>
 reducer.py 2 <reducer 1 address> <reducer 1 port> <reducer 2 address> ...
 """
 
-obj_re = re.compile(r'{"[a-zA-Z]*": [0-9]+}')
+OBJ_RE = re.compile(r'{"[a-zA-Z]*": [0-9]+}')
 
 class Reducer(object):
     def __init__(self):
@@ -56,7 +62,7 @@ def get_next_object(buf):
     Returns:
     The next text object in the buffer, None if there isn't one.
     """
-    match = obj_re.match(buf)
+    match = OBJ_RE.match(buf)
     if match:
         return match.group(0)
     else:
@@ -88,6 +94,7 @@ def receive_values(reducer, source):
     reducer - A reducer object used to reduce the values.
     source - A network socket connected to a data source, usually a mapper.
     """
+    logging.info("Receiving values from", source.getpeername())
     data = ""
     while True:
         data += source.recv(1024)
@@ -106,6 +113,7 @@ def send_values(reducer, sink):
     reducer - A Reducer object.
     sink - A network socket connected to the output sink.
     """
+    logging.info("Sending values to", sink.getpeername())
     for mapping in reducer.vals.iteritems():
         sink.sendall('{"%s": %d}' % mapping)
     sink.sendall("\0")
@@ -128,32 +136,38 @@ def level_one_main():
         source_ip = sys.argv[2]
         source_port = int(sys.argv[3])
         local_port = int(sys.argv[4])
-
+        localhost = netutils.get_ip_addr()
+        logging.info("Preparing for level 1 reduce on host", localhost)
+        logging.info("Source:", source_ip, source_port)
+        
         # Set up sockets for remote communications.
         source = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        localhost = netutils.get_ip_addr()
+
 
         # Enable logging to file.
         logging.basicConfig(filename="reducer-%s.log" % localhost,
                             level=logging.DEBUG)
 
         # Bind to local address and listen for new connections (from srv_socket)
-        logging.debug("Binding to local address %s." % localhost)
+        logging.debug("Binding to local address %s.", localhost)
         srv_socket.bind((localhost, local_port))
         srv_socket.listen(0)
         
         # Accept the sink connection. Now we're ready to start reducing.
         (sink, sink_address) = srv_socket.accept()
+        logging.info("Received sink connection from", sink_address)
         srv_socket.close()
 
         # Reduce!
         source.connect((source_ip, source_port))
+        logging.info("Beginning reduce.")
         reducer = Reducer()
         receive_values(reducer, source)
         send_values(reducer, sink)
 
         # Clean up after.
+        logging.info("Closing connections.")
         sink.close()
         source.close()
         
@@ -163,7 +177,9 @@ def level_two_main():
     A level 2 reducer will accumulate the reduced data from the level 1 reducers
     provided at the command line and write the combined data to a pickle file.
     """
+    logging.info("Preparing for level 2 reduce.")
     outfile = sys.argv[2]
+    logging.info("Output file:")
     reducer = Reducer()
     for index in range(3, len(sys.argv), 2):
         reduce_host = sys.argv[index]
@@ -173,10 +189,14 @@ def level_two_main():
 
         # As soon as we connect, we're going to start receiving data.
         source.connect((reduce_host, reduce_port))
+        logging.info("Reducing.")
         receive_values(reducer, source)
+        logging.info("Closing connection.")
+        source.close()
 
     # Reduce completed. Write it out.
     outfile = open(outfile, "w")
+    logging.info("Dumping pickle file.")
     pickle.dump(reducer.vals, outfile)
     
 if __name__ == "__main__":
