@@ -59,10 +59,10 @@ def execute(source, sink):
         tokens = tokenize(data)
         for token in tokens:
             mapping = map_token(token)
-            sink.send('{"%s": %d}' % mapping)
+            sink.sendall('{"%s": %d}' % mapping)
         if data[-1] == "\0":
             break
-    sink.send("\0")
+    sink.sendall("\0")
 
 def main():
     if len(sys.argv) < 4:
@@ -93,7 +93,6 @@ def main():
         
         # Accept the sink connection. Now we're ready to start mapping.
         (sink, sink_address) = srv_socket.accept()
-        srv_socket.shutdown(socket.SHUT_RDWR)
         srv_socket.close()
 
         # Map!
@@ -101,8 +100,6 @@ def main():
         execute(source, sink)
 
         # Clean up after.
-        sink.shutdown(socket.SHUT_RDWR)
-        source.shutdown(socket.SHUT_RDWR)
         sink.close()
         source.close()
 

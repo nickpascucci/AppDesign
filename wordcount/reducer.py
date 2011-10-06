@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import logging
+import pickle
 import re
 import socket
 import sys
@@ -9,7 +10,8 @@ from AppDesign.util import netutils
 
 
 HELP = """Usage:
-reducer.py <mapper ip address> <mapper port> <reducer port>
+reducer.py 1 <mapper ip address> <mapper port> <reducer port>
+reducer.py 2 <reducer 1 address> <reducer 1 port> <reducer 2 address> ...
 """
 
 obj_re = re.compile(r'{"[a-zA-Z]*": [0-9]+}')
@@ -19,6 +21,11 @@ class Reducer(object):
         self.vals = {}
 
     def reduce(self, mapping):
+        """Combine values for the same key into one.
+
+        Args:
+        mapping - The mapping to reduce.
+        """
         key, val = mapping
         if key in self.vals:
             self.vals[key] += val
@@ -26,6 +33,14 @@ class Reducer(object):
             self.vals[key] = val
         
 def parse_object(token):
+    """Parse an object from text.
+
+    Args:
+    token - The text representation of the object.
+
+    Returns:
+    The object, reconstructed from text.
+    """
     token = token.replace("{", "(")
     token = token.replace("}", ")")
     token = token.replace(":", ",")
@@ -33,6 +48,14 @@ def parse_object(token):
     return obj
 
 def get_next_object(buf):
+    """Retrieve the next object from the buffer.
+
+    Args:
+    buf - The text buffer to read from.
+
+    Returns:
+    The next text object in the buffer, None if there isn't one.
+    """
     match = obj_re.match(buf)
     if match:
         return match.group(0)
@@ -40,6 +63,16 @@ def get_next_object(buf):
         return None
 
 def get_next_mapping(buf):
+    """Retrieve the next mapping from the buffer.
+
+    Args:
+    buf - The text buffer to read from.
+
+    Returns:
+    A tuple (mapping, new_buf). Mapping may be None if no mapping was found, or
+    it was incomplete. new_buf will be the contents of the buffer with the
+    mapping removed.
+    """
     obj_txt = get_next_object(buf)
     if obj_txt:
         new_buf = buf[len(obj_txt):]  # Cut out the part we just parsed.
@@ -48,35 +81,53 @@ def get_next_mapping(buf):
     else:
         return (None, buf)
             
-def execute(source, sink):
-    reducer = Reducer()
+def receive_values(reducer, source):
+    """Receive values from a network socket and reduce them.
+
+    Args:
+    reducer - A reducer object used to reduce the values.
+    source - A network socket connected to a data source, usually a mapper.
+    """
     data = ""
     while True:
         data += source.recv(1024)
-        print "Data:", data
         mapping, data = get_next_mapping(data)
         while mapping:
-            print "Got mapping:", mapping
             reducer.reduce(mapping)
             mapping, data = get_next_mapping(data)
-        if data[-1] == "\0":
-            break
+        if data:
+            if data[-1] == "\0":
+                break
+
+def send_values(reducer, sink):
+    """Send reduced values out on a network socket.
+
+    Args:
+    reducer - A Reducer object.
+    sink - A network socket connected to the output sink.
+    """
     for mapping in reducer.vals.iteritems():
-        sink.send('{"%s": %d}' % mapping)
-    sink.send("\0")
+        sink.sendall('{"%s": %d}' % mapping)
+    sink.sendall("\0")
         
-def main():
-    if len(sys.argv) < 4:
+def level_one_main():
+    """Main function for a level 1 reducer.
+
+    A level 1 reducer receives data from either a mapper or another level 1
+    reducer, and combines values which have the same key. When the reducer
+    receives null ('\\0') in the input, it ends the reduction.
+    """
+    if len(sys.argv) < 5:
         print "Too few arguments."
         print HELP
-    elif len(sys.argv) > 4:
+    elif len(sys.argv) > 5:
         print "Too many arguments."
         print HELP
     else:
         # Parse command line arguments.
-        source_ip = sys.argv[1]
-        source_port = int(sys.argv[2])
-        local_port = int(sys.argv[3])
+        source_ip = sys.argv[2]
+        source_port = int(sys.argv[3])
+        local_port = int(sys.argv[4])
 
         # Set up sockets for remote communications.
         source = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,19 +145,46 @@ def main():
         
         # Accept the sink connection. Now we're ready to start reducing.
         (sink, sink_address) = srv_socket.accept()
-        srv_socket.shutdown(socket.SHUT_RDWR)
         srv_socket.close()
 
         # Reduce!
         source.connect((source_ip, source_port))
-        execute(source, sink)
+        reducer = Reducer()
+        receive_values(reducer, source)
+        send_values(reducer, sink)
 
         # Clean up after.
-        sink.shutdown(socket.SHUT_RDWR)
-        source.shutdown(socket.SHUT_RDWR)
         sink.close()
         source.close()
         
-            
+def level_two_main():
+    """Main function for a level 2 reducer.
+
+    A level 2 reducer will accumulate the reduced data from the level 1 reducers
+    provided at the command line and write the combined data to a pickle file.
+    """
+    outfile = sys.argv[2]
+    reducer = Reducer()
+    for index in range(3, len(sys.argv), 2):
+        reduce_host = sys.argv[index]
+        reduce_port = int(sys.argv[index+1])
+        logging.info("Connecting to", reduce_host, reduce_port)
+        source = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # As soon as we connect, we're going to start receiving data.
+        source.connect((reduce_host, reduce_port))
+        receive_values(reducer, source)
+
+    # Reduce completed. Write it out.
+    outfile = open(outfile, "w")
+    pickle.dump(reducer.vals, outfile)
+    
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print "Too few arguments."
+        print HELP
+    else:
+        if int(sys.argv[1]) == 1:
+            level_one_main()
+        elif int(sys.argv[1]) == 2:
+            level_two_main()
