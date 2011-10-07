@@ -32,3 +32,5 @@ dist:
 	@cd ../ ; \
 	tar -czf AppDesign.tar.gz $(TOPLEVEL); \
 	mv AppDesign.tar.gz $(TOPLEVEL)
+
+presubmit: test docs dist
