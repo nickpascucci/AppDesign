@@ -4,7 +4,7 @@
 #
 # Licensed under the MIT License. See the full text in LICENSE.
 
-SUBDIRS = stats search wordcount
+SUBDIRS = stats search wordcount bookmarks
 TOPLEVEL = $(shell basename `pwd`)
 
 lint:
