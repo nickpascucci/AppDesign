@@ -4,7 +4,7 @@
 #
 # Licensed under the MIT License. See the full text in LICENSE.
 
-SUBDIRS = stats
+SUBDIRS = stats search wordcount bookmarks
 TOPLEVEL = $(shell basename `pwd`)
 
 lint:
@@ -32,3 +32,5 @@ dist:
 	@cd ../ ; \
 	tar -czf AppDesign.tar.gz $(TOPLEVEL); \
 	mv AppDesign.tar.gz $(TOPLEVEL)
+
+presubmit: test docs dist
