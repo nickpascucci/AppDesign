@@ -87,6 +87,10 @@ class Wave(object):
         """Normalize the volume of the wave."""
         max_possible = float(_get_max_value(self.sample_width))
         scale_factor = max_possible/self.max_amplitude
+        self.adjust_volume(scale_factor)
+
+    def adjust_volume(self, scale_factor):
+        """Adjust the volume of the wave."""
         for index, audio_frame in enumerate(self.audio):
             normalized_amplitude = int(audio_frame.amplitude * scale_factor)
             if abs(normalized_amplitude) > self.max_amplitude:
