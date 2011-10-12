@@ -72,7 +72,10 @@ class Wave(object):
         self.adjust_volume(scale_factor)
 
     def adjust_volume(self, scale_factor):
-        """Adjust the volume of the wave."""
+        """Adjust the volume of the wave.
+
+        @param scale_factor The scaling factor for the volume.
+        """
         for index, audio_frame in enumerate(self.audio):
             normalized_amplitude = int(audio_frame.amplitude * scale_factor)
             if abs(normalized_amplitude) > self.max_amplitude:
@@ -81,6 +84,10 @@ class Wave(object):
                                       amplitude=normalized_amplitude)
 
     def copy(self):
+        """Make a copy of the wave.
+
+        @return A new wave object which is a deep copy of this one.
+        """
         new_wave = Wave()
         new_wave.audio = self.audio[:]
         new_wave.frames = self.frames
@@ -130,6 +137,8 @@ class Wave(object):
 
         Raises a FormatError if the two waves' sample width, sample rate, or
         number of channels differ.
+
+        @param other Another wave.
         """
         if (other.channels != self.channels or
             other.sample_width != self.sample_width or
@@ -155,7 +164,11 @@ class Wave(object):
         return len(self.audio)
 
 def _get_max_value(num_bytes):
-    """Get the maximum value representable in a two's complement integer."""
+    """Get the maximum value representable in a two's complement
+    integer.
+
+    @param num_bytes The number of bytes in the integer.
+    """
     if num_bytes == 1:
         return 255
     else:
@@ -213,11 +226,31 @@ def _encode_int(sample_data):
 
 
 def generate_sine_wave(amplitude, frequency, rate, length):
+    """Generate a sine wave.
+
+    This is a generic preset function that wraps a general sine wave function
+    for easier use.
+    @param amplitude The amplitude of the wave.
+    @param frequency The frequency of the wave.
+    @param rate The sample rate.
+    @param length The amount of time to generate.
+    @return A new wave containing sine wave audio.
+    """
     function = lambda frequency, t: sin(frequency * t)
     return generate_wave(amplitude, frequency,
                          rate, length, function)
 
 def generate_square_wave(amplitude, frequency, rate, length):
+    """Generate a square wave.
+
+    This is a generic preset function that wraps a general square wave function
+    for easier use.
+    @param amplitude The amplitude of the wave.
+    @param frequency The frequency of the wave.
+    @param rate The sample rate.
+    @param length The amount of time to generate.
+    @return A new wave containing sine wave audio.
+    """
     def square_function(frequency, time):
         period = 1.0/frequency
         if time % period < period/2:
