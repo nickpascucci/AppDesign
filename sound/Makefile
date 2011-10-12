@@ -5,7 +5,7 @@ SRCS=processing.py
 TESTS=processing_test.py
 
 lint:
-	pylint --reports=n --include-ids=y --disable R0903,R0904 $(SRCS)
+	pylint --reports=n --include-ids=y --disable R0903,R0904,C0103 $(SRCS)
 
 test:
 	@for test in $(TESTS); do \

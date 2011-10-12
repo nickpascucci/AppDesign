@@ -17,7 +17,13 @@ class WaveTest(unittest.TestCase):
         cls.wave.load(TEST_FILE)
     
     def setUp(self):
-        pass
+        self.wave1 = processing.Wave()
+        self.wave2 = processing.Wave()
+        self.wave1.audio = range(11)
+        self.wave2.audio = range(10, 0, -1)
+        self.wave1.frames = 10
+        self.wave2.frames = 10
+
     
     def tearDown(self):
         pass
@@ -41,7 +47,26 @@ class WaveTest(unittest.TestCase):
     def test_get_max_val(self):
         assert processing._get_max_value(1) == 255
         assert processing._get_max_value(2) == 32767
-            
+
+    def test_add(self):
+        self.wave1 += self.wave2
+        for frame in self.wave1.audio:
+            assert frame == 10
+
+    def test_raises_error_if_waves_differ(self):
+        self.wave1.sample_width = 32
+        self.wave2.sample_width = 16
+        with self.assertRaises(processing.FormatError):
+            self.wave1 += self.wave2
+
+    def test_slice(self):
+        w1_slice = self.wave1[2:5]
+        assert w1_slice == range(2, 5)
+
+    def test_set_and_get_item(self):
+        self.wave1[3] = 4
+        assert self.wave1[3] == 4
+        
     # This test is being ignored, because while the two files may differ,
     # the saved file is still playable. The difference might be due to
     # additional metadata stored by Audacity.
