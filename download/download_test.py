@@ -46,7 +46,6 @@ class DownloadTest(unittest.TestCase):
    def test_sitename_matcher(self):
        site = "http://www.xkcd.com/208/"
        sitename = download.sitename(site)
-       print sitename
        assert "http://www.xkcd.com" == sitename       
        
 if __name__ == "__main__":
