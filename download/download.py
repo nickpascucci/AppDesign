@@ -2,6 +2,7 @@
 
 """Download images from the web."""
 
+import os
 import os.path
 import re
 import sys
@@ -70,18 +71,25 @@ def download_image(url, path):
         full_path = url + "/" + path
     if full_path:
         print "\tDownloading from", full_path
-        urllib.urlretrieve(full_path, os.path.basename(path))
+        urllib.urlretrieve(
+            full_path, os.path.join("img", os.path.basename(path)))
 
 def download_images(url):
     """Download all images from the given url.
 
     @param url The target URL.
+    @return A list of the images downloaded.
     """
     images = images_from_url(url)
+    try:
+        os.mkdir("img")
+    except OSError:
+        pass  # Directory already exists
     for image in images:
         print "Downloading", image
         download_image(url, image)
-
+    return images
+        
 def main():
     if len(sys.argv) != 2:
         print "Usage: download.py <url>"
