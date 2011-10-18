@@ -54,7 +54,12 @@ def sitename(url):
     @param url The url to truncate.
     @return The site's root URL.
     """
-    return sitename_matcher.match(url).group(0)
+    match = sitename_matcher.match(url + "/")
+    print "Stripping site name from ", url
+    if match:
+        return match.group(0)
+    else:
+        return None
 
 def download_image(url, path):
     """Download an image from the given url under path.
@@ -63,16 +68,17 @@ def download_image(url, path):
     @param path The path to download.
     """
     full_path = ""
+    filename =  os.path.join("img", os.path.basename(path))
     if path.startswith("http"):
         full_path = path
     elif path.startswith("/"):
-        full_path = sitename(url) + path
+        site = sitename(url)
+        full_path = site + path
     else:
         full_path = url + "/" + path
     if full_path:
-        print "\tDownloading from", full_path
-        urllib.urlretrieve(
-            full_path, os.path.join("img", os.path.basename(path)))
+        urllib.urlretrieve(full_path, filename)
+    return filename
 
 def download_images(url):
     """Download all images from the given url.
@@ -85,9 +91,9 @@ def download_images(url):
         os.mkdir("img")
     except OSError:
         pass  # Directory already exists
-    for image in images:
-        print "Downloading", image
-        download_image(url, image)
+    for index, image in enumerate(images):
+        filename = download_image(url, image)
+        images[index] = filename
     return images
         
 def main():
