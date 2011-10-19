@@ -1,0 +1,4 @@
+This program is written using the PySide bindings for Qt. If it's not working,
+make sure you have PySide and Qt installed:
+
+sudo apt-get install python-pyside

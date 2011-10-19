@@ -25,6 +25,8 @@ class MainWindow(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(window)
 
+        self.setWindowTitle("Image Downloader")
+        
         self.urlBar = window.urlBar
         self.view = window.graphicsView
         self.scene = QGraphicsScene()
@@ -47,6 +49,7 @@ class MainWindow(QWidget):
                       ' "Download".')
 
     def download_images(self):
+        """Grab images from the entered URL."""
         url = self.urlBar.text()
         self.set_text("Working!")
         self.images = download.download_images(url)
@@ -60,25 +63,34 @@ class MainWindow(QWidget):
         self.montageButton.setEnabled(True)
         
     def show_image(self, image):
+        """Show the image at the given path.
+
+        @param image The path to the image to show.
+        """
+        self.setWindowTitle(image + " - Image Downloader")
         self.scene.clear()
         image = QPixmap(image)
         self.scene.addPixmap(image)
         self.view.show()
 
     def next_image(self):
+        """Show the next image."""
         self.index = (self.index + 1) % len(self.images)
         self.show_image(self.images[self.index])
 
     def previous_image(self):
+        """Show the previous image."""
         length = len(self.images)
         self.index = (self.index - 1 + length) % length
         self.show_image(self.images[self.index])
 
     def montage(self):
+        """Create and show a montage of the "img" directory."""
         os.system("montage img/* img/montage.png")
         self.show_image("img/montage")
 
     def set_text(self, text):
+        """Set text in the image display area."""
         self.scene.clear()
         self.scene.addText(text)
 

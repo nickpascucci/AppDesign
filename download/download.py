@@ -55,7 +55,6 @@ def sitename(url):
     @return The site's root URL.
     """
     match = sitename_matcher.match(url + "/")
-    print "Stripping site name from ", url
     if match:
         return match.group(0)
     else:

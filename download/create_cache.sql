@@ -1,0 +1,1 @@
+CREATE TABLE cache (url TEXT, last_access INTEGER, filename TEXT)
