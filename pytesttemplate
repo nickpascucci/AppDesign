@@ -8,12 +8,12 @@ __author__ = "Nick Pascucci (npascut1@gmail.com)"
 
 
 class MyTest(unittest.TestCase):
-   def setUp(self):
-       pass
+    def setUp(self):
+        pass
 
-   def tearDown(self):
-       pass
+    def tearDown(self):
+        pass
 
 
 if __name__ == "__main__":
-   unittest.main()
+    unittest.main()

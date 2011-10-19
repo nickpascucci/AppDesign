@@ -101,4 +101,4 @@ def main():
     download_images(sys.argv[1])
 
 if __name__ == "__main__":
-   main()
+    main()
