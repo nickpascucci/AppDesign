@@ -15,10 +15,10 @@ class Scene(object):
     def render(self):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
-        for entity in self.entities:
-            entitity.render()
         self.camera.adjust()
+        for entity in self.entities:
+            entity.render()
         glFlush()
 
     def add(self, entity):
-        entities.append(entity)
+        self.entities.append(entity)
