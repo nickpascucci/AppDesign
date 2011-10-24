@@ -13,6 +13,7 @@ class Scene(object):
         self.entities = []
 
     def render(self):
+        """Draw the scene."""
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
@@ -33,4 +34,5 @@ class Scene(object):
         glFlush()
 
     def add(self, entity):
+        """Add a new entity to scene."""
         self.entities.append(entity)

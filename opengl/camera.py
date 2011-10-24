@@ -42,6 +42,12 @@ class Camera(object):
         "z:%s\n" % (self.x, self.y, self.z))
 
     def rotate(self, x=0, y=0, z=0):
+        """Rotate the camera.
+
+        @param x The x rotation.
+        @param y The y rotation.
+        @param z The z rotation.
+        """
         self.x_rotation += x
         self.y_rotation += y
         self.z_rotation += z

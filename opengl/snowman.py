@@ -13,7 +13,7 @@ class Snowman(object):
         self.z = 0
 
     def render(self):
-
+        """Render this snowman."""
         # Set the color (red, green, blue values from 0.0 to 1.0) to
         # paint in
         glColor3f(1, 1, 1)  

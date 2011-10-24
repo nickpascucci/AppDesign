@@ -28,6 +28,7 @@ class Renderer(object):
         self.scene.camera.translate(0, -.5, -4)
 
     def setup(self):
+        """Set up the OpenGL environment."""
         # Initialize the drawing environment (create main windows, etc)
         glutInit(sys.argv)
         glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
@@ -53,13 +54,16 @@ class Renderer(object):
         glutKeyboardFunc(self.on_key)
 
     def start(self):
+        """Begin the render."""
         glutDisplayFunc(self.render)
         glutMainLoop()
 
     def render(self):
+        """Render the scene."""
         self.scene.render()
 
     def on_key(self, key, x, y):
+        """Handle a keypress."""
         print "Received", key
         if key == "a":
             self.scene.camera.translate(x=0.05)
