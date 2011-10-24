@@ -27,6 +27,7 @@ class Camera(object):
         glRotate(self.y_rotation, 0, 1, 0)
         glRotate(self.z_rotation, 0, 0, 1)
 
+    # TODO Make this translate relative to current rotation.
     def translate(self, x=0, y=0, z=0):
         """Translate the camera in 3-Space.
 
@@ -39,3 +40,10 @@ class Camera(object):
         self.z += z
         print ("Camera state:\nx: %s\ny: %s\n"
         "z:%s\n" % (self.x, self.y, self.z))
+
+    def rotate(self, x=0, y=0, z=0):
+        self.x_rotation += x
+        self.y_rotation += y
+        self.z_rotation += z
+        print ("Camera state:\nx: %s\ny: %s\n"
+        "z:%s\n" % (self.x_rotation, self.y_rotation, self.z_rotation))

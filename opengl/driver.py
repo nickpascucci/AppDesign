@@ -19,26 +19,38 @@ class Renderer(object):
     def __init__(self):
         self.scene = Scene()
         self.scene.add(Snowman())
-    
+        sn2 = Snowman()
+        sn3 = Snowman()
+        sn2.x = 3
+        sn3.z = 2
+        self.scene.add(sn2)
+        self.scene.add(sn3)
+        self.scene.camera.translate(0, -.5, -4)
+
     def setup(self):
         # Initialize the drawing environment (create main windows, etc)
         glutInit(sys.argv)
-        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
+        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
         glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         glutCreateWindow(name)
 
+        glShadeModel(GL_SMOOTH)
+
+        glClearDepth(1.0)
+        glDepthFunc(GL_LESS)                                # The Type Of Depth Test To Do
+        glEnable(GL_DEPTH_TEST)                             # Enables Depth Testing
+        glShadeModel(GL_SMOOTH)                             # Enables Smooth Color Shading
+
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()                                    # Reset The Projection Matrix
+
+        # Calculate The Aspect Ratio Of The Window
+        gluPerspective(45.0, float(WINDOW_WIDTH)/float(WINDOW_HEIGHT), 0.1, 100.0)
+
+        glMatrixMode(GL_MODELVIEW)
+
         # Set up keyboard listeners.
         glutKeyboardFunc(self.on_key)
-
-        # Set up lighting.
-        # TODO Move this to the scene render.
-        light_diffuse = (1, 1, 1, 1)
-        light_position = (.5, 1, -.5, 1)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse)
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position)
-
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
 
     def start(self):
         glutDisplayFunc(self.render)
@@ -61,6 +73,19 @@ class Renderer(object):
             self.scene.camera.translate(z=0.05)
         elif key == "q":
             self.scene.camera.translate(z=-0.05)
+        elif key == "j":
+            self.scene.camera.rotate(y=-5)
+        elif key == "l":
+            self.scene.camera.rotate(y=5)
+        elif key == "k":
+            self.scene.camera.rotate(x=5)
+        elif key == "i":
+            self.scene.camera.rotate(x=-5)
+        elif key == "u":
+            self.scene.camera.rotate(z=5)
+        elif key == "o":
+            self.scene.camera.rotate(z=-5)
+
         self.render()
 
 def main():

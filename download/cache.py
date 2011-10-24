@@ -67,7 +67,7 @@ class Cache(object):
         self._cursor.execute("SELECT name FROM sqlite_master "
                              "WHERE type='table';")
         existing_tables = self._cursor.fetchone()
-        if not "cache" in existing_tables:
+        if not existing_tables or not "cache" in existing_tables:
             self._cursor.execute("CREATE TABLE cache (name TEXT, "
                                  "last_access INTEGER, retrieved_data BLOB);")
             self._db_conn.commit()

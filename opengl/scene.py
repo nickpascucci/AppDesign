@@ -15,7 +15,19 @@ class Scene(object):
     def render(self):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
+
+        # Adjust the scene to match current camera settings.
         self.camera.adjust()
+        
+        # Set up lighting.
+        light_diffuse = (1, 1, 1, 1)
+        light_position = (0, 5, 0, 1)
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_diffuse)
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+
         for entity in self.entities:
             entity.render()
         glFlush()

@@ -27,4 +27,11 @@ class Snowman(object):
         # (number longitude lines)
         # Arg 3 is the number of subdivisions along Z
         # (number latitude lines)
-        glutSolidSphere(.5, 90, 90)
+        glutSolidSphere(.4, 90, 90)
+        glTranslate(0, .55, 0)  # Move for the second sphere
+        
+        glutSolidSphere(.25, 90, 90)
+        glTranslate(0, .35, 0)  # Move for the third sphere
+        
+        glutSolidSphere(.18, 90, 90)
+        glTranslate(0, -.9, 0)  # Move back
